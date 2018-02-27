@@ -389,6 +389,6 @@ public class FaceRecognitionController {
 			e1.printStackTrace();
 		}
 		// 图片访问 http 地址
-		return "http://139.196.179.141:8080/upload/"+personId+randomUUID.toString()+".jpg";
+		return "http://127.0.0.1:8080/upload/"+personId+randomUUID.toString()+".jpg";
 	}
 }
