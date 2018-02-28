@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.qinmei.pojo.DeleteImg;
 import com.qinmei.pojo.PersonFace;
 import com.qinmei.pojo.PersonName;
 import com.qinmei.utils.FaceResult;
