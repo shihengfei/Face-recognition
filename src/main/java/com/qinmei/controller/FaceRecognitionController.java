@@ -144,7 +144,7 @@ public class FaceRecognitionController {
 		String personId = httpRequest.getParameter("personId");
 		
 		// 调用文件上传
-		String imageUrl = uploadImage(httpRequest,img);
+		DeleteImg uploadImage = uploadImage(httpRequest,img);
 
 		HttpClient httpclient = new DefaultHttpClient();
 		int code = 0;
@@ -164,7 +164,7 @@ public class FaceRecognitionController {
 			request.setHeader("Ocp-Apim-Subscription-Key", SUBSCRIPTION_KEY);
 
 			PersonFace personFace = new PersonFace();
-			personFace.setUrl(imageUrl);
+			personFace.setUrl(uploadImage.getUrl());
 			// 将对象转换为 json
 			String jsonUrl = JsonUtils.objectToJson(personFace);
 			StringEntity reqEntity = new StringEntity(jsonUrl);
@@ -264,7 +264,7 @@ public class FaceRecognitionController {
 		String personId = httpRequest.getParameter("personId");
 
 		// 调用文件上传
-		String imageUrl = uploadImage(httpRequest,img);
+		DeleteImg uploadImage = uploadImage(httpRequest,img);
 		
 		HttpClient httpclient = new DefaultHttpClient();
 		int code = 0 ;
@@ -282,7 +282,7 @@ public class FaceRecognitionController {
 			request.setHeader("Ocp-Apim-Subscription-Key", SUBSCRIPTION_KEY);
 
 			// 调用人脸检测传入 url 地址，返回 faceId
-			String faceId = getFaceId(imageUrl);
+			String faceId = getFaceId(uploadImage.getUrl());
 
 			// 将传递的数据封装
 			PersonFace personFace = new PersonFace();
@@ -297,6 +297,11 @@ public class FaceRecognitionController {
 
 			// 执行请求返回响应
 			HttpResponse response = httpclient.execute(request);
+			
+			// 删除验证后的图片
+			File file = new File(uploadImage.getImgLocation());
+			file.delete();
+			
 			code = response.getStatusLine().getStatusCode();
 			HttpEntity entity = response.getEntity();
 
@@ -372,10 +377,10 @@ public class FaceRecognitionController {
 	 * @param request
 	 * @return
 	 */
-	public String uploadImage(HttpServletRequest request, MultipartFile img) {
+	public DeleteImg uploadImage(HttpServletRequest request, MultipartFile img) {
 		// 获取 人员 id
 		String personId = request.getParameter("personId");
-		
+
 		// 获取工程所在根目录 
 		File root2=new File("../webapps");
 		// 为图片添加唯一识别
@@ -385,10 +390,13 @@ public class FaceRecognitionController {
 			rootDir2=root2.getCanonicalPath();
 			// 保存图片到硬盘 
 			img.transferTo(new File(rootDir2+"/upload/"+personId+randomUUID.toString()+".jpg"));
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		// 图片访问 http 地址
-		return "http://127.0.0.1:8080/upload/"+personId+randomUUID.toString()+".jpg";
-	}
+		DeleteImg deleteImg = new DeleteImg();
+		deleteImg.setUrl("http://ip:8080/upload/"+personId+randomUUID.toString()+".jpg");
+		deleteImg.setImgLocation(rootDir2+"/upload/"+personId+randomUUID.toString()+".jpg");
+		return deleteImg;
+  	}
 }
